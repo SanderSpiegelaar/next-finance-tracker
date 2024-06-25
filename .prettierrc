@@ -1,0 +1,19 @@
+{
+	"useTabs": true,
+	"tabWidth": 2,
+	"endOfLine": "lf",
+	"proseWrap": "preserve",
+	"parser": "typescript",
+	"printWidth": 200,
+	"trailingComma": "none",
+	"semi": false,
+	"singleQuote": false,
+	"quoteProps": "preserve",
+	"jsxBracketSameLine": false,
+	"bracketSpacing": true,
+	"arrowParens": "avoid",
+	"htmlWhitespaceSensitivity": "strict",
+	"vueIndentScriptAndStyle": false,
+	"embeddedLanguageFormatting": "off",
+	"trimTrailingWhitespace": true
+}
