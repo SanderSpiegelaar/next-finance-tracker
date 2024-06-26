@@ -15,5 +15,7 @@
 	"htmlWhitespaceSensitivity": "strict",
 	"vueIndentScriptAndStyle": false,
 	"embeddedLanguageFormatting": "off",
-	"trimTrailingWhitespace": true
+	"trimTrailingWhitespace": true,
+	"singleAttributePerLine": true,
+	"plugins": ["prettier-plugin-tailwindcss"]
 }
