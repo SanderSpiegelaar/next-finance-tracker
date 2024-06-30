@@ -2,6 +2,7 @@ import { z } from "zod"
 
 import { useNewTransaction } from "@/features/transactions/hooks/use-new-transaction"
 import { useCreateTransaction } from "@/features/transactions/api/use-create-transaction"
+import { TransactionForm } from "@/features/transactions/components/transaction-form"
 
 import { useCreateCategory } from "@/features/categories/api/use-create-category"
 import { useGetCategories } from "@/features/categories/api/use-get-categories"
@@ -17,6 +18,7 @@ import {
 	SheetHeader,
 	SheetTitle
 } from "@/components/ui/sheet"
+import { Loader2 } from "lucide-react"
 
 const formSchema = insertTransactionSchema.omit({
 	id: true
@@ -27,7 +29,7 @@ type FormValues = z.input<typeof formSchema>
 export const NewTransactionSheet = () => {
 	const { isOpen, onClose } = useNewTransaction()
 
-	const mutation = useCreateTransaction()
+	const createMutation = useCreateTransaction()
 
 	const categoryQuery = useGetCategories()
 	const categoryMutation = useCreateCategory()
@@ -51,8 +53,15 @@ export const NewTransactionSheet = () => {
 			name
 		})
 
+	const isPending =
+		createMutation.isPending ||
+		categoryMutation.isPending ||
+		accountMutation.isPending
+
+	const isLoading = categoryQuery.isLoading || accountQuery.isLoading
+
 	const onSubmit = (values: FormValues) => {
-		mutation.mutate(values, {
+		createMutation.mutate(values, {
 			onSuccess: () => {
 				onClose()
 			}
@@ -71,7 +80,20 @@ export const NewTransactionSheet = () => {
 						Create a new transaction to track your transactions.
 					</SheetDescription>
 				</SheetHeader>
-				<p>Transaction Form</p>
+				{isLoading ? (
+					<div className="absolute inset-0 flex items-center justify-center">
+						<Loader2 className="size-4 animate-spin text-muted-foreground" />
+					</div>
+				) : (
+					<TransactionForm
+						onSubmit={onSubmit}
+						disabled={isPending}
+						categoryOptions={categoryOptions}
+						onCreateCategory={onCreateCategory}
+						accountOptions={accountOptions}
+						onCreateAccount={onCreateAccount}
+					/>
+				)}
 			</SheetContent>
 		</Sheet>
 	)
