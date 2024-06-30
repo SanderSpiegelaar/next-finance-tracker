@@ -189,7 +189,7 @@ export const TransactionForm = ({
 					className="w-full"
 					disabled={disabled}
 				>
-					{id ? "Save changes" : "Create account"}
+					{id ? "Save changes" : "Create Transaction"}
 				</Button>
 				{!!id && (
 					<Button
