@@ -1,8 +1,11 @@
 import { useState } from "react"
+import { format, parse } from "date-fns"
+
 import { Button } from "@/components/ui/button"
+import { convertAmountToMiliUnits } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
 import { ImportTable } from "./import-table"
-import { WeekNumberClickEventHandler } from "react-day-picker"
 
 const dateFormat = "yyyy-MM-dd HH:mm:ss"
 const outputFormat = "yyyy-MM-dd"
@@ -45,6 +48,46 @@ export const ImportCard = ({ data, onCancel, onSubmit }: Props) => {
 
 	const progress = Object.values(selectedColumns).filter(Boolean).length
 
+	const handleContinue = () => {
+		const getColumnIndex = (column: string) => column.split("_")[1]
+
+		const mappedData = {
+			headers: headers.map((_header, index) => {
+				const columnIndex = getColumnIndex(`column_${index}`)
+				return selectedColumns[`column_${columnIndex}`] || null
+			}),
+			body: body
+				.map((row) => {
+					const transformedRow = row.map((cell, index) => {
+						const columnIndex = getColumnIndex(`column_${index}`)
+						return selectedColumns[`column_${columnIndex}`] ? cell : null
+					})
+
+					return transformedRow.every((item) => item === null)
+						? []
+						: transformedRow
+				})
+				.filter((row) => row.length > 0)
+		}
+
+		const arrayOfData = mappedData.body.map((row) => {
+			return row.reduce((acc: any, cell, index) => {
+				const header = mappedData.headers[index]
+				if (header !== null) acc[header] = cell
+
+				return acc
+			}, {})
+		})
+
+		const formattedData = arrayOfData.map((item) => ({
+			...item,
+			amount: convertAmountToMiliUnits(parseFloat(item.amount)),
+			date: format(parse(item.date, dateFormat, new Date()), outputFormat)
+		}))
+
+		onSubmit(formattedData)
+	}
+
 	return (
 		<div className="mx-auto -mt-24 w-full max-w-screen-2xl pb-10">
 			<Card className="border-none drop-shadow-sm">
@@ -64,7 +107,7 @@ export const ImportCard = ({ data, onCancel, onSubmit }: Props) => {
 							className="w-full lg:w-auto"
 							size="sm"
 							disabled={progress < requiredOptions.length}
-							onClick={() => {}}
+							onClick={handleContinue}
 						>
 							Continue ({progress} / {requiredOptions.length})
 						</Button>
